@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "name": "swar-frontend",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "@swar_api_url",
+    "REACT_APP_WS_URL": "@swar_ws_url"
+  },
+  "build": {
+    "env": {
+      "REACT_APP_API_URL": "@swar_api_url",
+      "REACT_APP_WS_URL": "@swar_ws_url"
+    }
+  },
+  "functions": {
+    "frontend/src/**/*.ts": {
+      "runtime": "@vercel/node@18"
+    }
+  }
+}

@@ -33,6 +33,11 @@ def classify(code_input: CodeInput):
     prediction = model_pipeline.predict([code_input.code])
     return {"genre": prediction[0]}
 
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring and load balancers."""
+    return {"status": "healthy", "service": "swar-backend"}
+
 @app.websocket("/ws/visualizer")
 async def websocket_endpoint(websocket: WebSocket):
     """

@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: swar-backend
+    env: python
+    buildCommand: |
+      cd backend &&
+      pip install -r requirements.txt &&
+      mkdir -p vendor &&
+      cd vendor &&
+      git clone https://github.com/tree-sitter/tree-sitter-go &&
+      git clone https://github.com/tree-sitter/tree-sitter-javascript &&
+      cd .. &&
+      python -c "from tree_sitter import Language; Language.build_library('build/languages.so', ['vendor/tree-sitter-go', 'vendor/tree-sitter-javascript'])"
+    startCommand: "cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: info
+
+  - type: web
+    name: swar-frontend
+    env: static
+    buildCommand: |
+      cd frontend &&
+      npm ci &&
+      npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: swar-backend
+          property: url
+      - key: REACT_APP_WS_URL
+        fromService:
+          type: web
+          name: swar-backend
+          property: url

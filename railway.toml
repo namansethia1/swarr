@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  backend:
+    source: backend
+    variables:
+      PORT: 8000
+      ENVIRONMENT: production
+      LOG_LEVEL: info
+    healthcheck:
+      path: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      numReplicas: 2
+      sleepModeDelayMinutes: 10
+
+  frontend:
+    source: frontend
+    variables:
+      PORT: 3000
+      REACT_APP_API_URL: ${{backend.RAILWAY_STATIC_URL}}
+      REACT_APP_WS_URL: ${{backend.RAILWAY_STATIC_URL}}
+    healthcheck:
+      path: /health
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      numReplicas: 1
